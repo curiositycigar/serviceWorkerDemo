@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="manifest" href="/manifest.json">
-  
+
   <!-- Add to home screen for Safari on iOS -->
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -42,13 +42,38 @@
   <script src="./static/cityCode.js"></script>
   <script src="./static/main.js"></script>
   <script type="text/javascript">
-    // 注册serviceWorker
+    // 注册serviceWorker，注意延迟serviceWorker注册直至必要的初始页面资源加载完毕
     if (navigator.serviceWorker) {
       navigator.serviceWorker
         .register('./service-worker.js')
-        .then(function () {
+        .then(function (reg) {
           console.log('service worker registered!')
+          reg.installing; // the installing worker, or undefined
+          reg.waiting; // the waiting worker, or undefined
+          reg.active; // the active worker, or undefined
+
+          reg.addEventListener('updatefound', () => {
+            // A wild service worker has appeared in reg.installing!
+            const newWorker = reg.installing;
+
+            newWorker.state;
+            // "installing" - the install event has fired, but not yet complete
+            // "installed"  - install complete
+            // "activating" - the activate event has fired, but not yet complete
+            // "activated"  - fully active
+            // "redundant"  - discarded. Either failed install, or it's been
+            //                replaced by a newer version
+
+            newWorker.addEventListener('statechange', () => {
+              // newWorker.state has changed
+            });
+          });
         })
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        // This fires when the service worker controlling this page
+        // changes, eg a new worker has as skipped waiting and become
+        // the new active worker. 
+      });
     }
   </script>
 </body>

@@ -12,6 +12,7 @@ var urlPrefix = '192.168.213.201:8234';
 
 self.addEventListener('install', function (e) {
   console.log('[ServiceWorker] install');
+  // 判断是否第一次安装，然后提示用户重启后将会更新应用
   e.waitUntil(
     caches.open(cacheName).then(function (cache) {
       console.log('[ServiceWorker] caching app shell');
