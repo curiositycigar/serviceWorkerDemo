@@ -9,3 +9,9 @@ console.log(data)
 // fetch('https://baidu.com').then(res => {
 //   console.log(res)
 // })
+// const cardTemplate = `
+//   <div></div>
+// `
+// window.onload = function () {
+
+// }

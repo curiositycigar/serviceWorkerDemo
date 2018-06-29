@@ -1,7 +1,9 @@
 var cacheName = 'weatherApp-v1';
 var dataCacheName = 'weatherData-v1';
+var assetsCacheName = 'weatherAssets-v1';
 var filesToCache = [
   '/',
+  '/manifest.json',
   '/index.html',
   '/static/main.js',
   '/static/main.css',
@@ -55,4 +57,18 @@ self.addEventListener('fetch', function (e) {
       })
     );
   }
+});
+
+// server push
+self.addEventListener('push', function (e) {
+  let title = 'new message!';
+  let body = 'You get a $100 bonus';
+  let icon = './images/smiley.svg';
+  let tag = 'simple-push-example-tag';
+  console.log('got fake push!')
+  e.waitUntil(
+    self.registration.showNotification(title, {
+      body, icon, tag
+    })
+  )
 });

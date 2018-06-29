@@ -25,6 +25,11 @@ header.header{
   font-weight: 400;
 }
 
+.button-group{
+  display: flex;
+  justify-items: center;
+}
+
 .header-button{
   border: none;
   background: none;
