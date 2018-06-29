@@ -1,3 +1,5 @@
+// chche polyfill https://github.com/jimmywarting/cache-polyfill
+// importScripts('./cache-polyfill.js');
 var cacheName = 'weatherApp-v1';
 var dataCacheName = 'weatherData-v1';
 var assetsCacheName = 'weatherAssets-v1';
@@ -10,6 +12,10 @@ var filesToCache = [
   '/static/fetch.js',
   '/static/cityCode.js'
 ];
+var assetsToCache = [
+  '/images/ic_add_white_24px.svg',
+  '/images/ic_refresh_white_24px.svg'
+]
 var urlPrefix = '192.168.213.201:8234';
 
 self.addEventListener('install', function (e) {
@@ -63,7 +69,7 @@ self.addEventListener('fetch', function (e) {
 self.addEventListener('push', function (e) {
   let title = 'new message!';
   let body = 'You get a $100 bonus';
-  let icon = './images/smiley.svg';
+  let icon = './images/clear.png';
   let tag = 'simple-push-example-tag';
   console.log('got fake push!')
   e.waitUntil(
