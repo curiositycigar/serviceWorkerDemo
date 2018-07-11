@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    table {
+      border: 1px solid #000;
+    }
+
+    table td {
+      width: 20px;
+      height: 20px;
+      background: #f5f5f5;
+    }
+
+    table td.wall {
+      background: #343434;
+    }
+
+    table td.move {
+      background: #ff0000;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="block">
+
+  </div>
+  <script>
+    let rect = [
+      [0, 0, 0, null, 0, 0],
+      [0, 0, null, null, 0, 0],
+      [0, 0, null, 0, 0, 0],
+      [0, 0, null, 0, 0, 0],
+      [0, null, 0, 0, 0, 0],
+      [0, 0, null, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0],
+    ]
+    let width = 30
+    let height = 30
+    for (let i = 0; i < width; i++) {
+      rect[i] = []
+      for (let j = 0; j < height; j++) {
+        rect[i][j] = Math.random() > 0.7 ? null : 0
+      }
+    }
+    rect[0][0] = 0
+    rect[width - 1][height - 1] = 0
+    let doms = []
+    let table = document.createElement('table')
+    for (let i in rect) {
+      let tr = document.createElement('tr')
+      table.appendChild(tr)
+      doms[i] = []
+      for (let j in rect[i]) {
+        let td = document.createElement('td')
+        td.className = rect[i][j] === null ? 'wall' : ''
+        tr.appendChild(td)
+        doms[i][j] = td
+      }
+    }
+    document.querySelector('#block').appendChild(table)
+
+    // let begin = { x: 2, y: 1 }
+    // let end = { x: 2, y: 3 }
+    let begin = { x: 0, y: 0 }
+    let end = { x: width - 1, y: height - 1 }
+    console.log(begin, end)
+
+    let closed = {}
+    let opened = {
+      [begin.x + '_' + begin.y]: {
+        ...begin,
+        g: 1,
+        h: H(end, begin),
+        f: H(end, begin) + 1,
+        parent: null
+      }
+    }
+
+    function H(P, E) {
+      let distanceX = Math.abs(P.x - E.x)
+      let distanceY = Math.abs(P.y - E.y)
+      let dX = 1.01
+      let dY = 1
+      if (distanceX < distanceY) {
+        dX = 1
+        dY = 1.01
+      }
+      return distanceX * dX + distanceY * dY
+    }
+
+    function canPass(map, pos) {
+      if (map[pos.x] === undefined) {
+        return false
+      }
+      let number = map[pos.x][pos.y]
+      return number !== null && number !== undefined && number !== -1
+    }
+    let stepCount = 0
+    while (true) {
+      console.log(++stepCount)
+      // 判断openedList 是否为空
+      let isOpenedEmpty = true
+      for (let key in opened) {
+        isOpenedEmpty = false
+        break
+      }
+      // 为空退出
+      if (isOpenedEmpty) {
+        break
+      }
+      // 找到当前openedList中f值最小的节点
+      let recordBestBlock = ''
+      for (let key in opened) {
+        if (!opened[recordBestBlock] || opened[recordBestBlock].h > opened[key].h) {
+          recordBestBlock = key
+        }
+      }
+      let bestBlock = opened[recordBestBlock]
+      let { x, y } = bestBlock
+      // 遍历四个方向
+      let nextSteps = [
+        { x, y: y - 1 },
+        { x, y: y + 1 },
+        { x: x - 1, y },
+        { x: x + 1, y },
+      ]
+      nextSteps.forEach(item => {
+        let index = item.x + '_' + item.y
+        // 判断是否可以通过
+        if (canPass(rect, item)) {
+          // 如果在closedList中，忽略
+          // 否则，若不在openedList中，加入，并设置父节点
+          // 若在openedList中，计算新的g值，和旧的相比，选择最优的
+          if (!closed[index] && !opened[index]) {
+            let g = bestBlock.g + 1
+            let h = H(end, item)
+            opened[index] = {
+              ...item,
+              g,
+              h,
+              f: h + g,
+              parent: bestBlock,
+            }
+          } else if (opened[index]) {
+            let currentOpened = opened[index]
+            let g = bestBlock.g + 1
+            if (g < currentOpened.g) {
+              currentOpened.g = g
+              currentOpened.f = currentOpened.h + g
+              currentOpened.parent = bestBlock
+            }
+          }
+        }
+      })
+      // 从openedList移动到closedList
+      closed[recordBestBlock] = opened[recordBestBlock]
+      delete opened[recordBestBlock]
+      if (bestBlock.x === end.x && bestBlock.y === end.y) {
+        // 遍历路径
+        let prevBlock = bestBlock
+        while (prevBlock) {
+          let { x, y } = prevBlock
+          console.log(x, y)
+          doms[x][y].className = 'move'
+          prevBlock = prevBlock.parent
+        }
+        console.log('done')
+        break;
+      }
+    }
+  </script>
+</body>
+
+</html>
