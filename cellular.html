@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+</head>
+
+<body>
+  <div>
+    <canvas id="canvas" width="400" height="400"></canvas>
+  </div>
+  <script>
+    let width = 100
+    let height = 100
+    let size = 4
+    let world = [...new Array(height)].map(() => [...new Array(width)].map(() => Math.random() > 0.9 ? 1 : 0))
+    // for (let i = 0; i < height; i++) {
+    //   world[i][height / 2] = 1
+    // }
+    let canvas = document.querySelector('canvas')
+    canvas.width = width * size
+    canvas.height = height * size
+    let ctx = canvas.getContext('2d')
+    ctx.putImageData(createImageData(world, size), 0, 0)
+
+    window.setInterval(function () {
+      world = nextState(world)
+      ctx.putImageData(createImageData(world, size), 0, 0)
+    }, 100)
+    //  nextState(world)
+    window.setInterval(function() {
+      world[1][0] = 1
+      world[2][1] = 1
+      world[0][2] = 1
+      world[1][2] = 1
+      world[2][2] = 1
+    }, 1000)
+
+    function nextState(world) {
+      let newWorld = [...new Array(height)].map(() => new Array(width))
+      for (let i = 0; i < height; i++) {
+        for (let j = 0; j < width; j++) {
+          let count = add(
+            world[i + 1] ? world[i + 1][j] : 0,
+            world[i + 1] ? world[i + 1][j + 1] : 0,
+            world[i + 1] ? world[i + 1][j - 1] : 0,
+            world[i - 1] ? world[i - 1][j] : 0,
+            world[i - 1] ? world[i - 1][j - 1] : 0,
+            world[i - 1] ? world[i - 1][j + 1] : 0,
+            world[i][j - 1],
+            world[i][j + 1]
+          )
+          if (count === 2) {
+            newWorld[i][j] = world[i][j]
+          } else if (count === 3) {
+            newWorld[i][j] = 1
+          } else {
+            newWorld[i][j] = 0
+          }
+        }
+      }
+      return newWorld
+    }
+
+    function createImageData(world, size) {
+      let imgData = ctx.createImageData(width * size, height * size)
+      for (let i = 0; i < height * size; i++) {
+        for (let j = 0; j < width * size; j++) {
+          let index = (i * width * size + j) * 4
+          imgData.data[index + 0] = 0;
+          imgData.data[index + 1] = 0;
+          imgData.data[index + 2] = 0;
+          if (world[Math.floor(i / size)][Math.floor(j / size)] === 1) {
+            imgData.data[index + 3] = 255;
+          } else {
+            imgData.data[index + 3] = 0;
+          }
+        }
+      }
+      return imgData
+    }
+
+    function add(...arg) {
+      return arg.reduce(function (total, num) {
+        return total + (num === 1 ? 1 : 0)
+      }, 0)
+    }
+  </script>
+</body>
+
+</html>
