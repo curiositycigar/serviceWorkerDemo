@@ -12,8 +12,8 @@
     }
 
     table td {
-      width: 20px;
-      height: 20px;
+      width: 10px;
+      height: 10px;
       background: #f5f5f5;
     }
 
@@ -86,13 +86,7 @@
     function H(P, E) {
       let distanceX = Math.abs(P.x - E.x)
       let distanceY = Math.abs(P.y - E.y)
-      let dX = 1.01
-      let dY = 1
-      if (distanceX < distanceY) {
-        dX = 1
-        dY = 1.01
-      }
-      return distanceX * dX + distanceY * dY
+      return distanceX + distanceY
     }
 
     function canPass(map, pos) {
